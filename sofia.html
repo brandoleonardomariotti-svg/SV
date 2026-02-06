@@ -1,79 +1,193 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>San Valentino</title>
-    <style>
-        body {
-            background-color: #ffefef;
-            text-align: center;
-            font-family: "Arial", sans-serif;
-            overflow: hidden;
-        }
-        h1 {
-            color: #ff007f;
-        }
-        .heart {
-            position: absolute;
-            top: -50px;
-            width: 100px;
-            height: 100px;
-            background-color: #ff007f;
-            transform: rotate(45deg);
-            animation: float 10s infinite;
-        }
-        .heart::before,
-        .heart::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background-color: #ff007f;
-        }
-        .heart::before {
-            left: 50px;
-        }
-        .heart::after {
-            left: 0;
-        }
-        @keyframes float {
-            0% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-30px);
-            }
-            100% {
-                transform: translateY(0);
-            }
-        }
-        #audio {
-            display: none;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>San Valentino 💖</title>
+<style>
+  body {
+    margin:0;
+    padding:0;
+    font-family: 'Arial', sans-serif;
+    color:white;
+    text-align:center;
+    overflow:hidden;
+    background: linear-gradient(135deg, #ff758c, #ff7eb3);
+    height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+  }
+
+  .page {
+    position:absolute;
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    transition: opacity 1s ease;
+  }
+
+  .hidden { opacity:0; pointer-events:none; }
+
+  h1 { margin-bottom:20px; }
+
+  #heart {
+    font-size:60px;
+    cursor:pointer;
+    animation: pulse 1s infinite;
+  }
+
+  @keyframes pulse {
+    0%{transform:scale(1);}
+    50%{transform:scale(1.2);}
+    100%{transform:scale(1);}
+  }
+
+  #message { font-size:18px; margin-bottom:25px; min-height:28px; }
+
+  button {
+    font-size:18px;
+    padding:12px 25px;
+    margin:8px;
+    border:none;
+    border-radius:30px;
+    cursor:pointer;
+    transition:all 0.3s ease;
+  }
+
+  #yes { background:#fff; color:#ff4d6d; }
+  #no { background:#ff4d6d; color:white; position:absolute; }
+  .option { background:#fff; color:#ff4d6d; display:block; margin:10px auto; }
+
+  /* cuoricini animati */
+  .floating-heart {
+    position:absolute;
+    font-size:24px;
+    animation: floatUp 3s linear forwards;
+    pointer-events:none;
+  }
+
+  @keyframes floatUp {
+    0%{transform:translateY(0) scale(1);}
+    100%{transform:translateY(-300px) scale(1.5); opacity:0;}
+  }
+</style>
 </head>
 <body>
-    <h1>Happy San Valentino!</h1>
-    <div class="heart"></div>
-    <audio id="audio" loop autoplay>
-        <source src="path_to_your_romantic_music.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
-    </audio>
-    <script>
-        function createFloatingHearts() {
-            const heart = document.createElement("div");
-            heart.classList.add("heart");
-            heart.style.left = Math.random() * window.innerWidth + 'px';
-            heart.style.animationDuration = (Math.random() * 15 + 5) + "s";
-            document.body.appendChild(heart);
-            setTimeout(() => {
-                heart.remove();
-            }, 20000);
-        }
-        setInterval(createFloatingHearts, 500);
-    </script>
+
+<!-- Musica romantica -->
+<audio id="music" loop>
+  <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_7c8a3e3b9b.mp3?filename=romantic-piano-112191.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Pagina iniziale -->
+<div id="startPage" class="page">
+  <h1>Sofia, ho una domanda per te...</h1>
+  <div id="heart">❤️</div>
+</div>
+
+<!-- Pagina principale -->
+<div id="mainPage" class="page hidden">
+  <div class="box" id="content">
+    <h1>Vuoi essere la mia Valentina? 💘</h1>
+    <div id="message"></div>
+    <button id="yes">SÌ 💖</button>
+    <button id="no">NO 😅</button>
+  </div>
+</div>
+
+<script>
+const startPage = document.getElementById("startPage");
+const mainPage = document.getElementById("mainPage");
+const heart = document.getElementById("heart");
+
+heart.addEventListener("click", () => {
+  startPage.classList.add("hidden");
+  mainPage.classList.remove("hidden");
+});
+
+// Main page elements
+const noBtn = document.getElementById("no");
+const yesBtn = document.getElementById("yes");
+const message = document.getElementById("message");
+const content = document.getElementById("content");
+const music = document.getElementById("music");
+
+const phrases = [
+  "Questo NO non ti rappresenta 😏",
+  "Dai, sappiamo entrambi la risposta ❤️",
+  "Prometto che sarà un bel momento ✨",
+  "Ultimo tentativo prima del SÌ 😇",
+  "Ok basta, clicca quello giusto 💖",
+  "Sicura? Io ho già scelto 😌"
+];
+
+let index = 0;
+
+// NO button scappa e cambia frase
+noBtn.addEventListener("mouseover", () => {
+  message.textContent = phrases[index % phrases.length];
+  index++;
+
+  const x = Math.random() * (window.innerWidth - 120);
+  const y = Math.random() * (window.innerHeight - 120);
+  noBtn.style.left = x + "px";
+  noBtn.style.top = y + "px";
+
+  yesBtn.style.transform = `scale(${1 + index*0.08})`;
+});
+
+// YES button
+yesBtn.addEventListener("click", () => {
+  // vibrazione
+  if (navigator.vibrate) navigator.vibrate([200,100,200]);
+  // musica
+  music.play();
+  // cuoricini animati
+  createHearts();
+
+  content.innerHTML = ``
+    <h1>Perfetto 😍</h1>
+    <p>Allora scegli cosa facciamo per la serata ✨</p>
+    <button class="option">🍝 Cena romantica</button>
+    <button class="option">🍕 Pizza + film</button>
+    <button class="option">🍷 Uscita a sorpresa</button>
+    <button class="option">🏠 Serata cozy insieme</button>
+  ``;
+
+  document.querySelectorAll(".option").forEach(btn => {
+    btn.addEventListener("click", () => {
+      // dissolvenza romantica
+      content.style.transition = "opacity 2s ease";
+      content.style.opacity = 0;
+      setTimeout(() => {
+        content.innerHTML = ``
+          <h1>Grazie per la scelta ❤️</h1>
+          <p>Comunque io ho già deciso 😌</p>
+          <p style="margin-top:30px; font-style:italic;">il tuo Brirbi 💖</p>
+        ``;
+        content.style.opacity = 1;
+      }, 2000);
+    });
+  });
+});
+
+// Funzione per creare cuoricini animati
+function createHearts(){
+  for(let i=0;i<20;i++){ 
+    const h = document.createElement("div");
+    h.textContent = "❤️";
+    h.className = "floating-heart";
+    h.style.left = Math.random()*window.innerWidth + "px";
+    h.style.fontSize = (16+Math.random()*20) + "px";
+    document.body.appendChild(h);
+    setTimeout(() => h.remove(), 3000);
+  }
+}
+</script>
+
 </body>
 </html>
